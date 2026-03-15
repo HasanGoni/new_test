@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "new_test"
+  site-url: "https://HasanGoni.github.io/new_test"
+  description: ""
+  repo-branch: main
+  repo-url: "https://github.com/HasanGoni/new_test"
