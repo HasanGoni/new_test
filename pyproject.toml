@@ -1,56 +1,29 @@
-[build-system]
-requires = ["setuptools>=64"]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "new_test"
-dynamic = ["version"]
-description = ""
+name = "semvision"
+version = "0.1.0"
+description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-license = {text = "Apache-2.0"}
-authors = [{name = "hasan", email = "hasanme1412@gmail.com"}]
-keywords = ['nbdev']
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-]
 dependencies = [
-    "fastcore>=1.12.24",
+    "fastcore>=1.12.16",
     "ipykernel>=7.2.0",
-    "ipywidgets>=8.1.8",
-    "jupyterlab>=4.5.6",
-    "matplotlib>=3.10.8",
     "nbdev>=3.0.12",
     "opencv-python-headless>=4.13.0.92",
-    "timm>=1.0.25",
+    "timm>=1.0.24",
     "torch>=2.10.0",
     "torchvision>=0.25.0",
-    # Local cv_tools (same workspace: git_data/cv_tools). Use absolute path so uv lock resolves it.
-    "cv_tools",
-    "private_front_easy_pin_detection",
-    "fastprogress>=1.1.5",
-    "smbprotocol>=1.16.0",
-    "pysmb>=1.2.13",
-    "albumentations>=2.0.8",
-    "nbconvert>=7.17.0",
+    "tqdm>=4.67.3",
 ]
 
-[project.urls]
-Repository = "https://github.com/HasanGoni/new_test"
-Documentation = "https://HasanGoni.github.io/new_test/"
+[[tool.uv.index]]
+url = "https://artifactory.intra.infineon.com/artifactory/api/pypi/pypi-pypi-org/simple"
+default = true
 
-[project.entry-points.nbdev]
-new_test = "new_test._modidx:d"
-
-[tool.setuptools.dynamic]
-version = {attr = "new_test.__version__"}
-
-[tool.setuptools.packages.find]
-include = ["new_test"]
+[dependency-groups]
+dev = [
+    "semvision",
+]
 
 [tool.uv.sources]
-cv_tools = { path = "/home/hasan/workspace/projects/git_data/cv_tools", editable = true }
-private_front_easy_pin_detection = { path = "/home/hasan/workspace/projects/git_data/private_front_easy_pin_detection", editable = true }
+be-vision-ad-tools = { path = "/home/ai_dsx.work/data/projects/goni/semvision", editable = true }
 
-[tool.nbdev]

@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name="2025-end-test-pin-detection-patch"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python=">=3.12"
+dependencies = [
+    "cv_tools",
+    "datasets>=4.4.2",
+    "dvc>=3.66.1",
+    "fastcore>=1.11.2",
+    "fastprogress>=1.1.3",
+    "hydra-core>=1.3.2",
+    "ipykernel>=6.30.1",
+    "jupyter>=1.1.1",
+    "jupyterlab>=4.5.4",
+    "numpy>=1.26.4",
+    "onnxruntime>=1.23.2",
+    "opencv-python>=4.11.0.86",
+    "plotly>=6.6.0",
+    "private_easy_end_test",
+    "private_front_easy_pin_detection",
+    "pysmb>=1.2.13",
+    "python-dotenv>=1.2.1",
+    "tensorboard>=2.20.0",
+    "torch>=2.9.1",
+    "torchinfo>=1.8.0",
+    "torchvision>=0.24.1",
+    "tqdm>=4.67.1",
+]
+
+[tool.uv]
+no-build-isolation-package = ["cv_tools", "private_easy_end_test", "be_vision_ad_tools", "private_front_easy_pin_detection"]
+
+[[tool.uv.index]]
+url = "https://artifactory.intra.infineon.com/artifactory/api/pypi/pypi-pypi-org/simple"
+default = true
+
+[dependency-groups]
+dev = [
+    "be_vision_ad_tools",
+]
+
+[tool.uv.sources]
+cv_tools = { path = "/home/ai_dsx.work/data/projects/goni/cv_tools", editable = true }
+private_easy_end_test = { path = "../private_easy_end_test", editable = true }
+be_vision_ad_tools = { path = "/home/ai_dsx.work/data/projects/be-vision-ad-tools", editable = true }
+private_front_easy_pin_detection = {path ="/home/ai_dsx.work/data/projects/goni/private_front_easy_pin_detection", editable = true}
+end_test_pin_detection_patch = {path ="/home/ai_dsx.work/data/projects/goni/2025-end-test-pin-detection-patch", editable = true}

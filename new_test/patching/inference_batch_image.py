@@ -5,10 +5,11 @@
 # %% auto #0
 __all__ = ['CV_TOOLS', 'front', 'current_lib', 'dilation_pt', 'erosion_pt', 'load_end_test_model_only_model',
            'load_end_test_model', 'TiledInferenceModel', 'TiledInferenceModelv2', 'frm_im22im1',
-           'process_image_im1_im2_j', 'TwoImageModelPyTorch', 'create_two_image_model_pytorch', 'export_to_onnx',
-           'load_whole_pipeline_model', 'InferenceTwoImageDataset', 'segmentation_collate_fn', 'create_pin_dl',
-           'post_process_mask', 'predict_batch', 'split_images_into_chunks', 'create_bash_script_content',
-           'generate_tflex_commands', 'load_file_list', 'process_image_pair_chunks', 'main_']
+           'process_image_im1_im2_j', 'extract_type_from_filename', 'TwoImageModelPyTorch',
+           'create_two_image_model_pytorch', 'export_to_onnx', 'load_whole_pipeline_model', 'InferenceTwoImageDataset',
+           'segmentation_collate_fn', 'create_pin_dl', 'post_process_mask', 'get_mask_stats', 'predict_batch',
+           'split_images_into_chunks', 'create_bash_script_content', 'generate_tflex_commands', 'load_file_list',
+           'process_image_pair_chunks', 'main_']
 
 # %% ../../nbs/49_patching.inference_batch_image.ipynb #a4bd3c4e
 from socket import gethostname
@@ -16,6 +17,7 @@ from typing import Callable, Tuple,List,Dict,Any
 from fastcore.script import *
 from fastcore.all import *
 from fastprogress import progress_bar
+from collections import Counter
 import json
 
 
@@ -29,6 +31,11 @@ from torchvision.transforms import ToTensor
 from torchvision.transforms.functional import to_tensor
 from torchvision.transforms.functional import to_pil_image
 from torchvision.transforms.functional import to_tensor
+
+# %% ../../nbs/49_patching.inference_batch_image.ipynb #2f59c6f5
+from cv_tools.core import *
+from cv_tools.imports import *
+
 
 # %% ../../nbs/49_patching.inference_batch_image.ipynb #9e62f73b
 CV_TOOLS = Path(r'/home/ai_sintercra/homes/hasan/projects/git_data/cv_tools')
@@ -279,6 +286,15 @@ def process_image_im1_im2_j(
     im2 = im2.astype(np.float32)/255.0
     p_img = np.stack((im1, im2), axis=-1)[None,...]
     return torch.from_numpy(p_img).permute(0,3,1,2)
+
+# %% ../../nbs/49_patching.inference_batch_image.ipynb #0cff1771
+def extract_type_from_filename(fn:str)->str:
+    'Extract the type from the filename'
+    match = re.search(r'_(?:In|Out)_(\d+)_', Path(fn).name)
+    return match.group(1)
+
+
+
 
 # %% ../../nbs/49_patching.inference_batch_image.ipynb #86da8d64
 def erosion_pt(
@@ -800,6 +816,40 @@ def post_process_mask(
 	if original_size is not None:
 		mask_ = mask_.resize(original_size, resample=Image.Resampling.NEAREST)
 	return mask_
+
+
+# %% ../../nbs/49_patching.inference_batch_image.ipynb #56d84037
+def get_mask_stats(
+    mask:Union[tuple, np.ndarray],# mask to get stats from
+    threshold:float=0.5 # threshold for mask
+    )->dict:
+    "Get mask stats after prediction"
+
+    if isinstance(mask, tuple):
+        mask = mask[0]
+    if isinstance(mask, torch.Tensor):
+        mask = mask.detach().cpu().numpy()
+    if mask.ndim == 3:
+        mask = mask[0,:,:]
+    if mask.ndim == 4:
+        mask = mask[0,0,:,:]
+    assert mask.ndim == 2, f"Mask must be 2D,3D or 4D array, got {mask.ndim}D array"
+
+
+    if mask.dtype == np.float32:
+        mask = (mask > threshold).astype(np.uint8)
+    mask255 = (mask *255).astype(np.uint8)
+    contours = find_contours_binary(mask255)
+    areas = [cv2.contourArea(c) for c in contours]
+    return {
+        'pin_cnt':len(contours),
+        'max_pin_area':max(areas),
+        'min_pin_area':min(areas),
+        'mean_pin_area':np.mean(areas),
+        'median_pin_area':np.median(areas),
+        'std_pin_area':np.std(areas),
+        'pin_areas':areas
+    }
 
 
 # %% ../../nbs/49_patching.inference_batch_image.ipynb #613559c6
