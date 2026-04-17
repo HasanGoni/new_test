@@ -1,0 +1,32 @@
+# Hydra config for training the 3-channel binary pin segmentation model on HPC
+# Override values from CLI, e.g.:
+#   python end_test_pin_detection_patch/scripts/train_hpc.py root="/path/to/dataset" num_epochs=100
+
+# Data paths
+root: "/path/to/patch_dataset"          # Root dir produced by build_patch_dataset
+checkpoint_dir: "checkpoints/train_hpc" # Where to save .pth checkpoints
+
+# Model
+arch: "mobilenet_v2"   # smp encoder name: mobilenet_v2, resnet34, efficientnet-b0, ...
+pretrained: true
+in_channels: 3
+
+# Training
+num_epochs: 60
+batch_size: 16
+encoder_lr: 1.0e-4
+decoder_lr: 1.0e-3
+freeze_epochs: 0     # freeze encoder for this many initial epochs (0 = no freeze)
+crop_size: 256
+device_str: "cuda"
+use_amp: true
+save_every: 5
+resume: true         # resume from latest.pth if it exists
+
+# Hydra configuration
+hydra:
+  run:
+    dir: .
+  output_subdir: null
+  job:
+    chdir: false
